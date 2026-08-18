@@ -19,15 +19,16 @@ public class Inventario {
         return instancia;
     }
 
+
     //Metodos CRUD
 
+    //  Crear producto 
     public boolean crearProducto(Producto producto){
-        if( buscarProducto(producto.getId())!=null){
-            System.out.println("Error: El producto ya existe.");
+        if(producto== null){
             return false;           
         }
-        productos.add(producto);
-        System.out.println("Producto agregado correctamente.");
+        getInstancia().productos.add(producto);
+        getInstancia().gestorArchivo.guardarCatalogo(getInstancia().productos);
         return true;
     }
 
@@ -39,7 +40,8 @@ public class Inventario {
         }
         return null;
     }
-
+    
+    //  Leer productos
     public void leerProductos(){
         if(productos.size() == 0){
             System.out.println("No hay productos en el inventario.");
@@ -50,6 +52,7 @@ public class Inventario {
         }
     }
 
+    //Actualizar producto
     public boolean actualizarProducto(int id, double nuevoPrecio, int nuevoStock){
         Producto producto= buscarProducto(id);
 
@@ -60,10 +63,13 @@ public class Inventario {
             return true;
         }
 
+        getInstancia().gestorArchivo.guardarCatalogo(getInstancia().productos);
+
         System.out.println("Producto no encontrado");
         return false;
     }
 
+    //Eliminar producto
     public boolean eliminarProducto(int id){
         Producto producto=buscarProducto(id);
         if(producto!=null){
@@ -71,6 +77,7 @@ public class Inventario {
             System.out.println("Producto eliminado");
             return true;
         }
+        getInstancia().gestorArchivo.guardarCatalogo(getInstancia().productos);
         System.out.println("Producto no encontrado");
         return false;
     }
