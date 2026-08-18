@@ -25,7 +25,7 @@ public class Inventario {
         if( buscarProducto(producto.getId())!=null){
             System.out.println("Error: El producto ya existe.");
             return false;           
-    }
+        }
         productos.add(producto);
         System.out.println("Producto agregado correctamente.");
         return true;
