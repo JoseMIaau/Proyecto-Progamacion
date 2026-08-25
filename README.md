@@ -1,3 +1,8 @@
 # Proyecto-Progamacion
-Hola que pasa
- ola we ekisde probando commit xdxd aqui mauricio 67
+Backend (vios)
+javiwisiddi -->  Javiera Ortega
+JoseMIaau --> José Maureira
+Frontend (pencas)
+Straciastellarossa --> Antonia Medina
+Mauricio-S-Rojas --> Mauricio Rojas
+
