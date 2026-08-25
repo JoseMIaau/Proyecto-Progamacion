@@ -1,4 +1,6 @@
 package modelo;
+
+import java.util.ArrayList;
 import persistencia.GestorArchivo;
 import java.util.List;
 
@@ -24,14 +26,21 @@ public class Inventario {
 
     //  Crear producto 
     public boolean crearProducto(Producto producto){
-        if(producto== null){
-            return false;           
+        if(producto == null || buscarProducto(producto.getId()) != null){
+            return false;
         }
-        getInstancia().productos.add(producto);
-        getInstancia().gestorArchivo.guardarCatalogo(getInstancia().productos);
+
+        // verifica que el precio y el stock no sean negativos (como va a valer -100 pesos jajalolxd :V)
+        if(producto.getPrecio() < 0 || producto.getStock() < 0){
+            return false;
+        }
+
+        productos.add(producto); // agrega el producto
+        gestorArchivo.guardarCatalogo(productos); // guarda el producto 
         return true;
     }
-
+    
+    // Busca el producto
     public Producto buscarProducto(int id){
         for(Producto p:productos){
             if(p.getId() == id){
@@ -42,43 +51,39 @@ public class Inventario {
     }
     
     //  Leer productos
-    public void leerProductos(){
-        if(productos.size() == 0){
-            System.out.println("No hay productos en el inventario.");
-        } else {
-            for(Producto p:productos){
-                System.out.println(p);
-            }
-        }
+    public List<Producto> leerProductos(){
+        return new ArrayList<>(productos);
     }
 
     //Actualizar producto
     public boolean actualizarProducto(int id, double nuevoPrecio, int nuevoStock){
+
+        // valida que el nuevo precio y stock no sean negativos dnvo xdxdloljaja
+        if(nuevoPrecio < 0 || nuevoStock < 0){
+            return false;
+        }
+
         Producto producto= buscarProducto(id);
 
         if(producto!=null){
-            producto.setPrecio(nuevoPrecio);
-            producto.setStock(nuevoStock);
-            System.out.println("Producto actualizado");
+            producto.setPrecio(nuevoPrecio); // cambia el precio 
+            producto.setStock(nuevoStock); // cambia el stock
+            gestorArchivo.guardarCatalogo(productos); // lo guarda 
             return true;
         }
-
-        getInstancia().gestorArchivo.guardarCatalogo(getInstancia().productos);
-
-        System.out.println("Producto no encontrado");
         return false;
     }
 
     //Eliminar producto
     public boolean eliminarProducto(int id){
+
         Producto producto=buscarProducto(id);
+
         if(producto!=null){
             productos.remove(producto);
-            System.out.println("Producto eliminado");
+            gestorArchivo.guardarCatalogo(productos);
             return true;
         }
-        getInstancia().gestorArchivo.guardarCatalogo(getInstancia().productos);
-        System.out.println("Producto no encontrado");
         return false;
     }
 }
