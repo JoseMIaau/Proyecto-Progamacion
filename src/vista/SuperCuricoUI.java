@@ -1,3 +1,4 @@
+/* 
 package vista;
 // Importamos Swing
 import javax.swing.*;
@@ -11,7 +12,7 @@ import java.awt.event.*;
  * Interfaz Java 
  * Solo UI y navegación básica entre pantallas
  * A ARREGLAR: BOTONES INICIO CON LAS IMAGENES COMO BOTONES, TAMBIÉN AGREGAR IMAGENES (LOGO, FOTOS, ETC.)
- */
+ 
 public class SuperCuricoUI extends JFrame {
 
     // La clase hereda de JFrame (Es la clase principal)
@@ -540,3 +541,7 @@ public class SuperCuricoUI extends JFrame {
         });
     }
 }
+*/
+
+
+//dejo todo el codigo comentado para que no haya problemas pero se vea el avance de la Anto
