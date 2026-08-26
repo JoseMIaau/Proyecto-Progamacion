@@ -26,6 +26,9 @@ public class VistaCarrito extends JPanel {
         left.setLayout(new BoxLayout(left, BoxLayout.Y_AXIS));
         left.setBorder(new EmptyBorder(30, 55, 30, 45));
 
+
+        //PRODUCTOS AGREGADOS MANUALMENTE
+        //TRABAJO PARA BACKEND: EN ESTA PARTE DEBERIA IR LA CONEXION LOGICA 
         left.add(createCartRow("Plátano", "$1.490", new Color(246, 220, 67)));
         left.add(Box.createVerticalStrut(20));
         left.add(createCartRow("Lechuga", "$790", new Color(115, 181, 77)));
@@ -118,6 +121,9 @@ public class VistaCarrito extends JPanel {
         qty.setPreferredSize(new Dimension(95, 32));
         controls.add(qty);
 
+        //BOTON DE BORRAR 
+        //PARA BACKEND: AQUI ENLAZAR CON BORRAR DEL INVENTARIO REAL
+        
         JButton trash = new JButton("🗑");
         trash.setFont(new Font("SansSerif", Font.PLAIN, 22));
         trash.setForeground(BaseFrame.VERDE);
@@ -247,7 +253,7 @@ public class VistaCarrito extends JPanel {
 
 
         // ARREGLA EL PROBLEMA DE TENER QUE BORRAR ANTES DE ESCRIBIR, SE BORRA AL HACER CLICK
-        
+
         field.addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent e) {
