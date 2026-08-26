@@ -5,6 +5,6 @@ public enum Categorias{
     BEBIDAS,
     PANADERIA,
     LIMPIEZA,
-    CARNICERA,
+    CARNICERIA,
     FRUTAS_Y_VERDURAS
 }
