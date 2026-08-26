@@ -26,7 +26,7 @@ public class GestorArchivo {
                                 p.getNombre()+separador+
                                 p.getPrecio()+separador+
                                 p.getStock()+separador+
-                                p.getCategoria();
+                                p.getCategoria().name();;
                 bw.write(linea);
                 bw.newLine();            
             }
