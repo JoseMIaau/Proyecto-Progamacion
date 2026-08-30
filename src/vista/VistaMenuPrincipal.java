@@ -1,247 +1,163 @@
 package vista;
 
+import modelo.Categorias;
+
 import javax.swing.*;
-import javax.swing.border.*;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 public class VistaMenuPrincipal extends JPanel {
-
     private final BaseFrame frame;
+    private JLabel bannerText;
+    private int indicePromo = 0;
+
+    private final String[] promociones = {
+            "<html><div style='text-align:center;'>Verduras frescas<br><b>TODOS LOS DÍAS</b></div></html>",
+            "<html><div style='text-align:center;'>Ofertas en Carnes y Lácteos<br><b>HASTA 30% DCTO</b></div></html>",
+            "<html><div style='text-align:center;'>Panadería y Abarrotes<br><b>CALIDAD GARANTIZADA</b></div></html>"
+    };
 
     public VistaMenuPrincipal(BaseFrame frame) {
-
         this.frame = frame;
-
         setLayout(new BorderLayout());
-        setBackground(BaseFrame.FONDO);
+        setBackground(EstilosUI.FONDO);
 
         add(createHeader(), BorderLayout.NORTH);
 
         JPanel center = new JPanel();
-        center.setBackground(BaseFrame.FONDO);
+        center.setBackground(EstilosUI.FONDO);
         center.setLayout(new BoxLayout(center, BoxLayout.Y_AXIS));
-        center.setBorder(new EmptyBorder(30, 80, 40, 80));
+        center.setBorder(new EmptyBorder(25, 60, 30, 60));
 
+        // Banner rotativo
         JPanel banner = new JPanel(new BorderLayout());
-
-        banner.setMaximumSize(new Dimension(700, 140));
-        banner.setPreferredSize(new Dimension(700, 140));
-        banner.setBackground(BaseFrame.VERDE_CLARO);
-
+        banner.setMaximumSize(new Dimension(750, 130));
+        banner.setPreferredSize(new Dimension(750, 130));
+        banner.setBackground(EstilosUI.VERDE_CLARO);
         banner.setBorder(new CompoundBorder(
-                new LineBorder(new Color(220, 220, 220)),
+                new LineBorder(new Color(220, 220, 220), 1, true),
                 new EmptyBorder(15, 20, 15, 20)
         ));
 
-        JLabel bannerText = new JLabel(
-                "<html><div style='text-align:center;'>"
-                + "Verduras frescas<br>"
-                + "<b>TODOS LOS DÍAS</b>"
-                + "</div></html>",
-                SwingConstants.CENTER
-        );
-
-        bannerText.setFont(BaseFrame.FONT_TITLE);
-        bannerText.setForeground(new Color(255, 236, 60));
-
+        bannerText = new JLabel(promociones[0], SwingConstants.CENTER);
+        bannerText.setFont(EstilosUI.FONT_TITLE);
+        bannerText.setForeground(new Color(255, 240, 70));
         banner.add(bannerText, BorderLayout.CENTER);
 
+        // Timer Swing para rotar las ofertas cada 3 segundos
+        Timer timerBanner = new Timer(3000, e -> {
+            indicePromo = (indicePromo + 1) % promociones.length;
+            bannerText.setText(promociones[indicePromo]);
+        });
+        timerBanner.start();
+
         center.add(banner);
-        center.add(Box.createVerticalStrut(35));
+        center.add(Box.createVerticalStrut(25));
 
-        JPanel categories = new JPanel(
-                new GridLayout(1, 4, 35, 0)
-        );
+        // Generación dinámica de categorías interactivas
+        JPanel categoriesPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 25, 10));
+        categoriesPanel.setOpaque(false);
 
-        categories.setOpaque(false);
-        categories.setMaximumSize(
-                new Dimension(820, 170)
-        );
+        for (Categorias cat : Categorias.values()) {
+            categoriesPanel.add(createCategoryCard(cat));
+        }
 
-        categories.add(
-                createCategory(
-                        "FRUTAS",
-                        new Color(244, 176, 65)
-                )
-        );
+        JScrollPane scrollCat = new JScrollPane(categoriesPanel);
+        scrollCat.setOpaque(false);
+        scrollCat.getViewport().setOpaque(false);
+        scrollCat.setBorder(null);
 
-        categories.add(
-                createCategory(
-                        "LÁCTEOS",
-                        new Color(235, 235, 235)
-                )
-        );
+        center.add(scrollCat);
+        center.add(Box.createVerticalStrut(20));
 
-        categories.add(
-                createCategory(
-                        "PANADERÍA",
-                        new Color(195, 139, 87)
-                )
-        );
-
-        categories.add(
-                createCategory(
-                        "CARNES",
-                        new Color(222, 145, 145)
-                )
-        );
-
-        center.add(categories);
-        center.add(Box.createVerticalGlue());
-
-        JButton enter = frame.roundedButton(
-                "VER PRODUCTOS",
-                BaseFrame.VERDE_CLARO,
-                BaseFrame.VERDE
-        );
-
+        JButton enter = EstilosUI.roundedButton("VER CATÁLOGO COMPLETO", EstilosUI.VERDE_CLARO, EstilosUI.VERDE);
         enter.setAlignmentX(Component.CENTER_ALIGNMENT);
-        enter.setMaximumSize(new Dimension(220, 45));
-
-        enter.addActionListener(
-                e -> frame.mostrarVista("PRODUCTOS")
-        );
+        enter.setMaximumSize(new Dimension(250, 45));
+        enter.addActionListener(e -> frame.mostrarVista("PRODUCTOS"));
 
         center.add(enter);
-
         add(center, BorderLayout.CENTER);
     }
 
     private JPanel createHeader() {
+        JPanel header = new JPanel(new BorderLayout(20, 0));
+        header.setBackground(EstilosUI.VERDE);
+        header.setBorder(new EmptyBorder(12, 28, 12, 28));
 
-        JPanel header = new JPanel(
-                new BorderLayout(20, 0)
-        );
-
-        header.setBackground(BaseFrame.VERDE);
-        header.setBorder(
-                new EmptyBorder(12, 28, 12, 28)
-        );
-
-        JPanel left = new JPanel(
-                new FlowLayout(
-                        FlowLayout.LEFT,
-                        18,
-                        0
-                )
-        );
-
+        JPanel left = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 0));
         left.setOpaque(false);
 
-        JButton menu = frame.iconButton("☰");
-
-        left.add(menu);
-
-        JLabel logo = new JLabel("◉");
-
-        logo.setFont(
-                new Font(
-                        "SansSerif",
-                        Font.BOLD,
-                        36
-                )
-        );
-
+        JLabel logo = new JLabel("◉  SuperCuricó");
+        logo.setFont(new Font("SansSerif", Font.BOLD, 22));
         logo.setForeground(Color.WHITE);
-
         left.add(logo);
-
         header.add(left, BorderLayout.WEST);
 
-        JTextField search =
-                new JTextField("Buscar en SuperCuricó");
+        //Placeholder
+        JTextField search = new JTextField("Buscar producto y presionar Enter...");
+        search.setFont(EstilosUI.FONT_NORMAL);
+        search.setForeground(Color.GRAY);
+        search.setBorder(new CompoundBorder(
+                new LineBorder(new Color(220, 220, 220), 1, true),
+                new EmptyBorder(7, 15, 7, 15)
+        ));
 
-        search.setFont(BaseFrame.FONT_NORMAL);
-        search.setForeground(new Color(120, 120, 120));
-
-        search.setBorder(
-                new CompoundBorder(
-                        new LineBorder(
-                                new Color(220, 220, 220),
-                                1,
-                                true
-                        ),
-                        new EmptyBorder(
-                                7, 18, 7, 18
-                        )
-                )
-        );
-
+        search.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    frame.buscarProductosPorTexto(search.getText().trim());
+                }
+            }
+        });
         header.add(search, BorderLayout.CENTER);
 
-        JButton cart = frame.iconButton("🛒");
-
-        cart.setFont(
-                new Font(
-                        "SansSerif",
-                        Font.PLAIN,
-                        28
-                )
-        );
-
-        cart.setToolTipText("Carro");
-
-        cart.addActionListener(
-                e -> frame.mostrarVista("CARRO")
-        );
-
+        JButton cart = EstilosUI.iconButton("🛒");
+        cart.addActionListener(e -> frame.mostrarVista("CARRO"));
         header.add(cart, BorderLayout.EAST);
 
         return header;
     }
 
-    private JPanel createCategory(
-            String name,
-            Color color
-    ) {
-
+    private JPanel createCategoryCard(Categorias cat) {
         JPanel p = new JPanel();
-
         p.setOpaque(false);
+        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
 
-        p.setLayout(
-                new BoxLayout(
-                        p,
-                        BoxLayout.Y_AXIS
-                )
-        );
+        JButton circleBtn = new JButton() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(EstilosUI.getColorPorCategoria(cat));
+                g2.fillOval(0, 0, getWidth(), getHeight());
+                g2.dispose();
+                super.paintComponent(g);
+            }
+        };
 
-        JPanel circle = new JPanel();
+        circleBtn.setPreferredSize(new Dimension(85, 85));
+        circleBtn.setMaximumSize(new Dimension(85, 85));
+        circleBtn.setFocusPainted(false);
+        circleBtn.setBorderPainted(false);
+        circleBtn.setContentAreaFilled(false);
+        circleBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        circleBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        circle.setBackground(color);
+        // Al hacer clic en el círculo, filtra los productos por esa categoría
+        circleBtn.addActionListener(e -> frame.mostrarProductosPorCategoria(cat));
 
-        circle.setPreferredSize(
-                new Dimension(115, 115)
-        );
+        JLabel label = new JLabel(cat.name().replace("_", " "));
+        label.setFont(new Font("SansSerif", Font.BOLD, 12));
+        label.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        circle.setMaximumSize(
-                new Dimension(115, 115)
-        );
-
-        circle.setBorder(
-                new LineBorder(
-                        new Color(230, 230, 230),
-                        1,
-                        true
-                )
-        );
-
-        circle.setAlignmentX(
-                Component.CENTER_ALIGNMENT
-        );
-
-        JLabel label = new JLabel(name);
-
-        label.setFont(BaseFrame.FONT_BOLD);
-
-        label.setAlignmentX(
-                Component.CENTER_ALIGNMENT
-        );
-
-        p.add(circle);
-        p.add(Box.createVerticalStrut(8));
+        p.add(circleBtn);
+        p.add(Box.createVerticalStrut(6));
         p.add(label);
-
         return p;
     }
 }

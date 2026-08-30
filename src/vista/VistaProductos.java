@@ -1,456 +1,215 @@
 package vista;
 
+import modelo.Categorias;
+import modelo.Inventario;
+import modelo.Producto;
+
 import javax.swing.*;
-import javax.swing.border.*;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.util.List;
 
 public class VistaProductos extends JPanel {
-
     private final BaseFrame frame;
+    private final JPanel grid;
+    private final JLabel headerTitle;
+    private final JTextField searchField;
 
     public VistaProductos(BaseFrame frame) {
-
         this.frame = frame;
-
         setLayout(new BorderLayout());
-        setBackground(BaseFrame.FONDO);
+        setBackground(EstilosUI.FONDO);
+
+        searchField = new JTextField();
+        headerTitle = new JLabel("Catálogo de Productos");
 
         add(createHeader(), BorderLayout.NORTH);
 
-        JPanel grid = new JPanel(
-                new GridLayout(2, 5, 28, 28)
-        );
+        grid = new JPanel(new GridLayout(0, 4, 20, 20));
+        grid.setBackground(EstilosUI.FONDO);
+        grid.setBorder(new EmptyBorder(25, 45, 25, 45));
 
-        grid.setBackground(BaseFrame.FONDO);
+        JScrollPane scroll = new JScrollPane(grid);
+        scroll.setBorder(null);
+        add(scroll, BorderLayout.CENTER);
 
-        grid.setBorder(
-                new EmptyBorder(
-                        30, 55, 35, 55
-                )
-        );
+        mostrarTodosLosProductos();
+    }
 
-        grid.add(
-                createProductCard(
-                        "Plátano",
-                        "$1.490",
-                        new Color(246, 220, 67)
-                )
-        );
+    public void mostrarTodosLosProductos() {
+        headerTitle.setText("Todos los Productos");
+        renderizarLista(Inventario.getInstancia().leerProductos());
+    }
 
-        grid.add(
-                createProductCard(
-                        "Manzana",
-                        "$1.190",
-                        new Color(187, 62, 55)
-                )
-        );
+    public void filtrarPorCategoria(Categorias cat) {
+        headerTitle.setText("Categoría: " + cat.name().replace("_", " "));
+        renderizarLista(Inventario.getInstancia().filtrarPorCategoria(cat));
+    }
+    
 
-        grid.add(
-                createProductCard(
-                        "Naranja",
-                        "$990",
-                        new Color(242, 150, 47)
-                )
-        );
+    private void renderizarLista(List<Producto> lista) {
+        grid.removeAll();
 
-        grid.add(
-                createProductCard(
-                        "Durazno",
-                        "$1.390",
-                        new Color(238, 139, 65)
-                )
-        );
-
-        grid.add(
-                createProductCard(
-                        "Frutilla",
-                        "$1.690",
-                        new Color(216, 56, 68)
-                )
-        );
-
-        grid.add(
-                createProductCard(
-                        "Lechuga",
-                        "$790",
-                        new Color(115, 181, 77)
-                )
-        );
-
-        grid.add(
-                createProductCard(
-                        "Tomate",
-                        "$990",
-                        new Color(219, 63, 53)
-                )
-        );
-
-        grid.add(
-                createProductCard(
-                        "Zanahoria",
-                        "$890",
-                        new Color(239, 132, 38)
-                )
-        );
-
-        grid.add(
-                createProductCard(
-                        "Cebolla",
-                        "$850",
-                        new Color(204, 153, 104)
-                )
-        );
-
-        grid.add(
-                createProductCard(
-                        "Brócoli",
-                        "$990",
-                        new Color(65, 133, 69)
-                )
-        );
-
-        add(grid, BorderLayout.CENTER);
+        if (lista.isEmpty()) {
+            JLabel vacio = new JLabel("No se encontraron productos registrados.");
+            vacio.setFont(EstilosUI.FONT_BOLD);
+            grid.add(vacio);
+        } else {
+            for (Producto p : lista) {
+                grid.add(createProductCard(p));
+            }
+        }
+        grid.revalidate();
+        grid.repaint();
     }
 
     private JPanel createHeader() {
+        JPanel header = new JPanel(new BorderLayout(15, 0));
+        header.setBackground(EstilosUI.VERDE);
+        header.setBorder(new EmptyBorder(12, 25, 12, 25));
 
-        JPanel header = new JPanel(
-                new BorderLayout(20, 0)
-        );
-
-        header.setBackground(BaseFrame.VERDE);
-
-        header.setBorder(
-                new EmptyBorder(
-                        12, 28, 12, 28
-                )
-        );
-
-        JPanel left = new JPanel(
-                new FlowLayout(
-                        FlowLayout.LEFT,
-                        18,
-                        0
-                )
-        );
-
+        JPanel left = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 0));
         left.setOpaque(false);
 
-        JButton menu = frame.iconButton("☰");
+        JButton btnVolver = EstilosUI.iconButton("☰");
+        btnVolver.setToolTipText("Volver al Inicio");
+        btnVolver.addActionListener(e -> frame.mostrarVista("INICIO"));
+        left.add(btnVolver);
 
-        menu.setToolTipText("Volver");
-
-        menu.addActionListener(
-                e -> frame.mostrarVista("INICIO")
-        );
-
-        left.add(menu);
-
-        JLabel logo = new JLabel("◉");
-
-        logo.setFont(
-                new Font(
-                        "SansSerif",
-                        Font.BOLD,
-                        36
-                )
-        );
-
-        logo.setForeground(Color.WHITE);
-
-        left.add(logo);
-
+        headerTitle.setFont(new Font("SansSerif", Font.BOLD, 18));
+        headerTitle.setForeground(Color.WHITE);
+        left.add(headerTitle);
         header.add(left, BorderLayout.WEST);
 
-        JTextField search =
-                new JTextField("Buscar en SuperCuricó");
+        searchField.setText("Buscar...");
+        searchField.setFont(EstilosUI.FONT_NORMAL);
+        searchField.setBorder(new CompoundBorder(
+                new LineBorder(new Color(220, 220, 220), 1, true),
+                new EmptyBorder(6, 12, 6, 12)
+        ));
+        searchField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    //crear metodo de buscar texto
+                }
+            }
+        });
+        header.add(searchField, BorderLayout.CENTER);
 
-        search.setFont(BaseFrame.FONT_NORMAL);
-        search.setForeground(
-                new Color(120, 120, 120)
-        );
-
-        search.setBorder(
-                new CompoundBorder(
-                        new LineBorder(
-                                new Color(220, 220, 220),
-                                1,
-                                true
-                        ),
-                        new EmptyBorder(
-                                7, 18, 7, 18
-                        )
-                )
-        );
-
-        header.add(search, BorderLayout.CENTER);
-
-        JButton cart = frame.iconButton("🛒");
-
-        cart.setFont(
-                new Font(
-                        "SansSerif",
-                        Font.PLAIN,
-                        28
-                )
-        );
-
-        cart.setToolTipText("Carro");
-
-        cart.addActionListener(
-                e -> frame.mostrarVista("CARRO")
-        );
-
+        JButton cart = EstilosUI.iconButton("🛒");
+        cart.addActionListener(e -> frame.mostrarVista("CARRO"));
         header.add(cart, BorderLayout.EAST);
 
         return header;
     }
 
-    private JPanel createProductCard(
-            String name,
-            String price,
-            Color productColor
-    ) {
-
+    private JPanel createProductCard(Producto prod) {
         JPanel card = new JPanel();
+        card.setBackground(EstilosUI.FONDO);
+        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
+        card.setBorder(new CompoundBorder(
+                new LineBorder(new Color(230, 230, 230), 1, true),
+                new EmptyBorder(12, 12, 12, 12)
+        ));
 
-        card.setBackground(BaseFrame.FONDO);
+        JPanel boxColor = new JPanel();
+        boxColor.setBackground(EstilosUI.getColorPorCategoria(prod.getCategoria()));
+        boxColor.setMaximumSize(new Dimension(140, 80));
+        boxColor.setPreferredSize(new Dimension(140, 80));
+        boxColor.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        card.setLayout(
-                new BoxLayout(
-                        card,
-                        BoxLayout.Y_AXIS
-                )
-        );
+        JLabel nameLabel = new JLabel(prod.getNombre());
+        nameLabel.setFont(EstilosUI.FONT_BOLD);
+        nameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        card.setBorder(
-                new EmptyBorder(
-                        8, 8, 8, 8
-                )
-        );
+        JLabel priceLabel = new JLabel("$" + (int) prod.getPrecio());
+        priceLabel.setFont(EstilosUI.FONT_NORMAL);
+        priceLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JPanel product = new JPanel();
+        JLabel stockLabel = new JLabel("Stock: " + prod.getStock());
+        stockLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
+        stockLabel.setForeground(Color.GRAY);
+        stockLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        product.setBackground(productColor);
+        JButton addBtn = EstilosUI.roundedButton("Agregar", EstilosUI.VERDE_CLARO, EstilosUI.VERDE);
+        addBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+        addBtn.setMaximumSize(new Dimension(120, 32));
+        addBtn.addActionListener(e -> showQuantityDialog(prod));
 
-        product.setMaximumSize(
-                new Dimension(125, 90)
-        );
-
-        product.setPreferredSize(
-                new Dimension(125, 90)
-        );
-
-        product.setBorder(
-                new LineBorder(
-                        new Color(230, 230, 230),
-                        1,
-                        true
-                )
-        );
-
-        product.setAlignmentX(
-                Component.CENTER_ALIGNMENT
-        );
-
-        JLabel nameLabel = new JLabel(name);
-
-        nameLabel.setFont(BaseFrame.FONT_BOLD);
-
-        nameLabel.setAlignmentX(
-                Component.CENTER_ALIGNMENT
-        );
-
-        JLabel priceLabel = new JLabel(price);
-
-        priceLabel.setFont(BaseFrame.FONT_NORMAL);
-
-        priceLabel.setAlignmentX(
-                Component.CENTER_ALIGNMENT
-        );
-
-        JButton add = frame.roundedButton(
-                "Agregar",
-                BaseFrame.VERDE_CLARO,
-                BaseFrame.VERDE
-        );
-
-        add.setAlignmentX(
-                Component.CENTER_ALIGNMENT
-        );
-
-        add.setMaximumSize(
-                new Dimension(120, 32)
-        );
-
-        add.addActionListener(
-                e -> showQuantityDialog(
-                        name,
-                        productColor
-                )
-        );
-
-        card.add(product);
-        card.add(Box.createVerticalStrut(7));
+        card.add(boxColor);
+        card.add(Box.createVerticalStrut(8));
         card.add(nameLabel);
         card.add(priceLabel);
-        card.add(Box.createVerticalStrut(7));
-        card.add(add);
+        card.add(stockLabel);
+        card.add(Box.createVerticalStrut(8));
+        card.add(addBtn);
 
         return card;
     }
 
-    private void showQuantityDialog(
-            String productName,
-            Color productColor
-    ) {
-
-        JDialog dialog = new JDialog(
-                frame,
-                "Agregar producto",
-                true
-        );
-
-        dialog.setSize(470, 260);
+    private void showQuantityDialog(Producto prod) {
+        JDialog dialog = new JDialog(frame, "Agregar " + prod.getNombre(), true);
+        dialog.setSize(420, 230);
         dialog.setLocationRelativeTo(frame);
         dialog.setLayout(new BorderLayout());
 
-        JPanel top = new JPanel(
-                new BorderLayout()
-        );
-
-        top.setBackground(BaseFrame.VERDE);
-
-        JLabel title = new JLabel(productName);
-
+        JPanel top = new JPanel(new BorderLayout());
+        top.setBackground(EstilosUI.VERDE);
+        JLabel title = new JLabel(" Seleccionar cantidad para " + prod.getNombre());
         title.setForeground(Color.WHITE);
-
-        title.setFont(BaseFrame.FONT_BOLD);
-
-        title.setBorder(
-                new EmptyBorder(
-                        8, 14, 8, 14
-                )
-        );
-
-        top.add(title, BorderLayout.WEST);
-
-        JButton close = frame.iconButton("×");
-
-        close.addActionListener(
-                e -> dialog.dispose()
-        );
-
-        top.add(close, BorderLayout.EAST);
-
+        title.setFont(EstilosUI.FONT_BOLD);
+        title.setBorder(new EmptyBorder(8, 12, 8, 12));
+        top.add(title, BorderLayout.CENTER);
         dialog.add(top, BorderLayout.NORTH);
 
         JPanel body = new JPanel();
+        body.setBackground(EstilosUI.FONDO);
+        body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
+        body.setBorder(new EmptyBorder(20, 20, 20, 20));
 
-        body.setBackground(BaseFrame.FONDO);
-
-        body.setLayout(
-                new BoxLayout(
-                        body,
-                        BoxLayout.Y_AXIS
-                )
-        );
-
-        body.setBorder(
-                new EmptyBorder(
-                        18, 25, 18, 25
-                )
-        );
-
-        JPanel visual = new JPanel();
-
-        visual.setBackground(productColor);
-
-        visual.setMaximumSize(
-                new Dimension(120, 70)
-        );
-
-        visual.setPreferredSize(
-                new Dimension(120, 70)
-        );
-
-        visual.setAlignmentX(
-                Component.CENTER_ALIGNMENT
-        );
-
-        body.add(visual);
-        body.add(Box.createVerticalStrut(14));
-
-        JPanel row = new JPanel(
-                new FlowLayout(
-                        FlowLayout.CENTER,
-                        12,
-                        0
-                )
-        );
-
+        JPanel row = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
         row.setOpaque(false);
 
-        JLabel label =
-                new JLabel("Ingrese Unidades");
+        JLabel lbl = new JLabel("Cantidad:");
+        lbl.setFont(EstilosUI.FONT_BOLD);
+        JTextField txtUnits = new JTextField("1", 4);
+        JComboBox<String> cbxSugeridos = new JComboBox<>(new String[]{"1", "2", "3", "5", "10"});
+        cbxSugeridos.addActionListener(e -> txtUnits.setText((String) cbxSugeridos.getSelectedItem()));
 
-        label.setOpaque(true);
-
-        label.setBackground(
-                BaseFrame.VERDE_CLARO
-        );
-
-        label.setBorder(
-                new EmptyBorder(
-                        7, 10, 7, 10
-                )
-        );
-
-        JTextField units =
-                new JTextField("0", 4);
-
-        JComboBox<String> step =
-                new JComboBox<>(
-                        new String[]{
-                            "0,5",
-                            "1",
-                            "1,5",
-                            "2"
-                        }
-                );
-
-        row.add(label);
-        row.add(units);
-        row.add(step);
-
+        row.add(lbl);
+        row.add(txtUnits);
+        row.add(cbxSugeridos);
         body.add(row);
-        body.add(Box.createVerticalStrut(16));
+        body.add(Box.createVerticalStrut(20));
 
-        JButton add = frame.roundedButton(
-                "Agregar",
-                BaseFrame.VERDE_CLARO,
-                BaseFrame.VERDE
-        );
+        JButton btnConfirmar = EstilosUI.roundedButton("CONFIRMAR", EstilosUI.VERDE_CLARO, EstilosUI.VERDE);
+        btnConfirmar.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnConfirmar.addActionListener(e -> {
+            try {
+                double cant = Double.parseDouble(txtUnits.getText().trim().replace(",", "."));
+                if (cant <= 0) {
+                    JOptionPane.showMessageDialog(dialog, "La cantidad debe ser mayor a 0", "Error", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+                if (cant > prod.getStock()) {
+                    JOptionPane.showMessageDialog(dialog, "Stock insuficiente. Solo quedan " + prod.getStock() + " unidades.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+                Inventario.getInstancia().agregarAlCarrito(prod, cant);
+                JOptionPane.showMessageDialog(dialog, "¡" + prod.getNombre() + " agregado al carrito!");
+                dialog.dispose();
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(dialog, "Ingrese un número válido", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
 
-        add.setAlignmentX(
-                Component.CENTER_ALIGNMENT
-        );
-
-        add.setMaximumSize(
-                new Dimension(120, 35)
-        );
-
-        add.addActionListener(
-                e -> dialog.dispose()
-        );
-
-        body.add(add);
-
-        dialog.add(
-                body,
-                BorderLayout.CENTER
-        );
-
+        body.add(btnConfirmar);
+        dialog.add(body, BorderLayout.CENTER);
         dialog.setVisible(true);
     }
 }

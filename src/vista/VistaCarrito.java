@@ -1,142 +1,151 @@
 package vista;
 
+import modelo.Inventario;
+import modelo.ItemCarrito;
+
 import javax.swing.*;
-import javax.swing.border.*;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
+import javax.swing.border.MatteBorder;
 import java.awt.*;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
+import java.util.List;
 
 public class VistaCarrito extends JPanel {
-
     private final BaseFrame frame;
+    private final JPanel leftPanel;
+    private final JPanel rightPanel;
+    private final JLabel totalLabel;
 
     public VistaCarrito(BaseFrame frame) {
         this.frame = frame;
-
         setLayout(new BorderLayout());
-        setBackground(BaseFrame.FONDO);
+        setBackground(EstilosUI.FONDO);
 
         add(createCartHeader(), BorderLayout.NORTH);
 
         JPanel content = new JPanel(new GridLayout(1, 2));
-        content.setBackground(BaseFrame.FONDO);
+        content.setBackground(EstilosUI.FONDO);
 
-        JPanel left = new JPanel();
-        left.setBackground(BaseFrame.FONDO);
-        left.setLayout(new BoxLayout(left, BoxLayout.Y_AXIS));
-        left.setBorder(new EmptyBorder(30, 55, 30, 45));
+        leftPanel = new JPanel();
+        leftPanel.setBackground(EstilosUI.FONDO);
+        leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
+        leftPanel.setBorder(new EmptyBorder(25, 40, 25, 30));
 
+        JScrollPane scrollLeft = new JScrollPane(leftPanel);
+        scrollLeft.setBorder(null);
 
-        //PRODUCTOS AGREGADOS MANUALMENTE
-        //TRABAJO PARA BACKEND: EN ESTA PARTE DEBERIA IR LA CONEXION LOGICA 
-        left.add(createCartRow("Plátano", "$1.490", new Color(246, 220, 67)));
-        left.add(Box.createVerticalStrut(20));
-        left.add(createCartRow("Lechuga", "$790", new Color(115, 181, 77)));
-        left.add(Box.createVerticalStrut(20));
-        left.add(createCartRow("Brócoli", "$990", new Color(65, 133, 69)));
-
-        JPanel right = new JPanel();
-        right.setBackground(BaseFrame.FONDO);
-        right.setLayout(new BoxLayout(right, BoxLayout.Y_AXIS));
-        right.setBorder(new CompoundBorder(
-                new MatteBorder(0, 2, 0, 0, Color.BLACK),
-                new EmptyBorder(35, 45, 35, 45)
+        rightPanel = new JPanel();
+        rightPanel.setBackground(EstilosUI.FONDO);
+        rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
+        rightPanel.setBorder(new CompoundBorder(
+                new MatteBorder(0, 2, 0, 0, Color.LIGHT_GRAY),
+                new EmptyBorder(30, 40, 30, 40)
         ));
 
-        right.add(summaryLine("Plátano", "$1.490"));
-        right.add(Box.createVerticalStrut(12));
-        right.add(summaryLine("Lechuga", "$790"));
-        right.add(Box.createVerticalStrut(12));
-        right.add(summaryLine("Brócoli", "$990"));
-        right.add(Box.createVerticalStrut(25));
+        totalLabel = new JLabel("Total: $0");
+        totalLabel.setFont(new Font("SansSerif", Font.BOLD, 22));
+        totalLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JLabel total = new JLabel("Total:     $3270");
-        total.setFont(new Font("SansSerif", Font.BOLD, 22));
-        total.setAlignmentX(Component.CENTER_ALIGNMENT);
-        right.add(total);
-
-        right.add(Box.createVerticalStrut(30));
-
-        JButton pagar = frame.roundedButton(
-                "PAGAR",
-                BaseFrame.VERDE_CLARO,
-                BaseFrame.VERDE
-        );
-
-        pagar.setAlignmentX(Component.CENTER_ALIGNMENT);
-        pagar.setMaximumSize(new Dimension(160, 44));
-        pagar.addActionListener(e -> showCheckoutDialog());
-
-        right.add(pagar);
-
-        content.add(left);
-        content.add(right);
-
+        content.add(scrollLeft);
+        content.add(rightPanel);
         add(content, BorderLayout.CENTER);
+
+        actualizarCarrito();
+    }
+
+    public void actualizarCarrito() {
+        leftPanel.removeAll();
+        rightPanel.removeAll();
+
+        List<ItemCarrito> items = Inventario.getInstancia().getCarrito();
+
+        if (items.isEmpty()) {
+            JLabel lblVacio = new JLabel("El carrito está vacío.");
+            lblVacio.setFont(EstilosUI.FONT_BOLD);
+            leftPanel.add(lblVacio);
+        } else {
+            for (ItemCarrito item : items) {
+                leftPanel.add(createCartRow(item));
+                leftPanel.add(Box.createVerticalStrut(12));
+
+                rightPanel.add(summaryLine(item.getProducto().getNombre() + " (x" + item.getCantidad() + ")", "$" + (int) item.getSubtotal()));
+                rightPanel.add(Box.createVerticalStrut(8));
+            }
+        }
+
+        rightPanel.add(Box.createVerticalStrut(20));
+        totalLabel.setText("Total: $" + (int) Inventario.getInstancia().calcularTotalCarrito());
+        rightPanel.add(totalLabel);
+        rightPanel.add(Box.createVerticalStrut(25));
+
+        JButton btnPagar = EstilosUI.roundedButton("PAGAR", EstilosUI.VERDE_CLARO, EstilosUI.VERDE);
+        btnPagar.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnPagar.setMaximumSize(new Dimension(160, 44));
+        btnPagar.addActionListener(e -> {
+            if (items.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Debe agregar productos antes de pagar", "Carro Vacío", JOptionPane.WARNING_MESSAGE);
+            } else {
+                showCheckoutDialog();
+            }
+        });
+        rightPanel.add(btnPagar);
+
+        revalidate();
+        repaint();
     }
 
     private JPanel createCartHeader() {
         JPanel header = new JPanel(new BorderLayout());
-        header.setBackground(BaseFrame.VERDE);
-        header.setBorder(new EmptyBorder(10, 28, 10, 28));
+        header.setBackground(EstilosUI.VERDE);
+        header.setBorder(new EmptyBorder(10, 25, 10, 25));
 
-        JButton back = frame.iconButton("☰");
+        JButton back = EstilosUI.iconButton("☰");
         back.addActionListener(e -> frame.mostrarVista("PRODUCTOS"));
         header.add(back, BorderLayout.WEST);
 
-        JLabel title = new JLabel("Mi carrito", SwingConstants.CENTER);
-        title.setOpaque(true);
-        title.setBackground(Color.WHITE);
-        title.setForeground(BaseFrame.VERDE);
-        title.setFont(new Font("SansSerif", Font.BOLD, 22));
-        title.setBorder(new EmptyBorder(6, 28, 6, 28));
+        JLabel title = new JLabel("Mi carrito de compras", SwingConstants.CENTER);
+        title.setForeground(Color.WHITE);
+        title.setFont(new Font("SansSerif", Font.BOLD, 20));
         header.add(title, BorderLayout.CENTER);
-
-        JButton cart = frame.iconButton("🛒");
-        cart.setFont(new Font("SansSerif", Font.PLAIN, 28));
-        header.add(cart, BorderLayout.EAST);
 
         return header;
     }
 
-    private JPanel createCartRow(String name, String price, Color productColor) {
-        JPanel row = new JPanel(new BorderLayout(18, 0));
-        row.setBackground(BaseFrame.FONDO);
-        row.setMaximumSize(new Dimension(Integer.MAX_VALUE, 115));
+    private JPanel createCartRow(ItemCarrito item) {
+        JPanel row = new JPanel(new BorderLayout(15, 0));
+        row.setBackground(EstilosUI.FONDO);
+        row.setMaximumSize(new Dimension(Integer.MAX_VALUE, 65));
+        row.setBorder(new CompoundBorder(
+                new LineBorder(new Color(230, 230, 230), 1, true),
+                new EmptyBorder(8, 12, 8, 12)
+        ));
 
-        JPanel product = new JPanel();
-        product.setPreferredSize(new Dimension(120, 90));
-        product.setBackground(productColor);
-        product.setBorder(new LineBorder(new Color(225, 225, 225), 1, true));
+        JLabel name = new JLabel(item.getProducto().getNombre() + " (x" + item.getCantidad() + ")");
+        name.setFont(EstilosUI.FONT_BOLD);
 
-        row.add(product, BorderLayout.WEST);
+        JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 0));
+        actions.setOpaque(false);
 
-        JPanel controls = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 28));
-        controls.setOpaque(false);
+        JLabel price = new JLabel("$" + (int) item.getSubtotal());
+        price.setFont(EstilosUI.FONT_BOLD);
 
-        JComboBox<String> qty = new JComboBox<>(
-                new String[]{"0,5", "1", "1,5", "2"}
-        );
-
-        qty.setPreferredSize(new Dimension(95, 32));
-        controls.add(qty);
-
-        //BOTON DE BORRAR 
-        //PARA BACKEND: AQUI ENLAZAR CON BORRAR DEL INVENTARIO REAL
-        
         JButton trash = new JButton("🗑");
-        trash.setFont(new Font("SansSerif", Font.PLAIN, 22));
-        trash.setForeground(BaseFrame.VERDE);
+        trash.setFont(new Font("SansSerif", Font.PLAIN, 18));
+        trash.setForeground(Color.RED);
         trash.setBorderPainted(false);
         trash.setContentAreaFilled(false);
+        trash.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        trash.addActionListener(e -> {
+            Inventario.getInstancia().eliminarDelCarrito(item.getProducto().getId());
+            actualizarCarrito();
+        });
 
-        controls.add(trash);
-        row.add(controls, BorderLayout.CENTER);
+        actions.add(price);
+        actions.add(trash);
 
-        JLabel p = new JLabel(price);
-        p.setFont(new Font("SansSerif", Font.BOLD, 21));
-        row.add(p, BorderLayout.EAST);
-
+        row.add(name, BorderLayout.WEST);
+        row.add(actions, BorderLayout.EAST);
         return row;
     }
 
@@ -145,134 +154,62 @@ public class VistaCarrito extends JPanel {
         line.setOpaque(false);
 
         JLabel a = new JLabel(name);
-        a.setFont(new Font("SansSerif", Font.BOLD, 18));
-
+        a.setFont(new Font("SansSerif", Font.PLAIN, 15));
         JLabel b = new JLabel(price);
-        b.setFont(new Font("SansSerif", Font.BOLD, 18));
+        b.setFont(new Font("SansSerif", Font.BOLD, 15));
 
         line.add(a, BorderLayout.WEST);
         line.add(b, BorderLayout.EAST);
-
-        line.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
-
+        line.setMaximumSize(new Dimension(Integer.MAX_VALUE, 24));
         return line;
     }
 
     private void showCheckoutDialog() {
-        JDialog dialog = new JDialog(frame, "Pago", true);
-
-        dialog.setSize(760, 390);
+        JDialog dialog = new JDialog(frame, "Finalizar Pago", true);
+        dialog.setSize(480, 360);
         dialog.setLocationRelativeTo(frame);
         dialog.setLayout(new BorderLayout());
 
-        JPanel top = new JPanel(new BorderLayout());
-        top.setBackground(BaseFrame.VERDE);
+        JPanel body = new JPanel();
+        body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
+        body.setBorder(new EmptyBorder(20, 30, 20, 30));
 
-        JLabel t = new JLabel("Finalizar compra");
-        t.setForeground(Color.WHITE);
-        t.setFont(BaseFrame.FONT_BOLD);
-        t.setBorder(new EmptyBorder(8, 14, 8, 14));
-        top.add(t, BorderLayout.WEST);
+        JLabel totalTxt = new JLabel("Total a pagar: $" + (int) Inventario.getInstancia().calcularTotalCarrito());
+        totalTxt.setFont(EstilosUI.FONT_TITLE);
+        totalTxt.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JButton close = frame.iconButton("×");
-        close.addActionListener(e -> dialog.dispose());
-        top.add(close, BorderLayout.EAST);
+        JTextField txtNombre = new JTextField();
+        JTextField txtDireccion = new JTextField();
+        JTextField txtTarjeta = new JTextField();
 
-        dialog.add(top, BorderLayout.NORTH);
+        body.add(totalTxt);
+        body.add(Box.createVerticalStrut(15));
+        body.add(new JLabel("Nombre Completo:"));
+        body.add(txtNombre);
+        body.add(Box.createVerticalStrut(8));
+        body.add(new JLabel("Direccion de entrega:"));
+        body.add(txtDireccion);
+        body.add(Box.createVerticalStrut(8));
+        body.add(new JLabel("N° Tarjeta:"));
+        body.add(txtTarjeta);
+        body.add(Box.createVerticalStrut(20));
 
-        JPanel content = new JPanel(new GridLayout(1, 2));
-        content.setBackground(BaseFrame.FONDO);
-
-        JPanel user = formPanel("Ingrese sus datos:");
-
-        addField(user, "Ingrese nombre");
-        addField(user, "Ingrese dirección");
-        addField(user, "Ingrese número telefónico");
-
-        JPanel payment = formPanel("Información de pago:");
-
-        addField(payment, "Número de tarjeta");
-        addField(payment, "Fecha de vencimiento");
-        addField(payment, "CVV");
-
-        payment.add(Box.createVerticalStrut(12));
-
-        JButton pay = frame.roundedButton(
-                "PAGAR",
-                BaseFrame.VERDE_CLARO,
-                BaseFrame.VERDE
-        );
-
-        pay.setAlignmentX(Component.CENTER_ALIGNMENT);
-        pay.setMaximumSize(new Dimension(140, 38));
-
-        payment.add(pay);
-
-        user.setBorder(new CompoundBorder(
-                new MatteBorder(0, 0, 0, 1, Color.BLACK),
-                new EmptyBorder(25, 30, 25, 30)
-        ));
-
-        payment.setBorder(new EmptyBorder(25, 30, 25, 30));
-
-        content.add(user);
-        content.add(payment);
-
-        dialog.add(content, BorderLayout.CENTER);
-        dialog.setVisible(true);
-    }
-
-    private JPanel formPanel(String title) {
-        JPanel p = new JPanel();
-
-        p.setBackground(BaseFrame.FONDO);
-        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
-
-        JLabel label = new JLabel(title);
-        label.setFont(new Font("SansSerif", Font.BOLD, 18));
-        label.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        p.add(label);
-        p.add(Box.createVerticalStrut(18));
-
-        return p;
-    }
-
-    private void addField(JPanel parent, String placeholder) {
-        JTextField field = new JTextField(placeholder);
-
-        field.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));
-        field.setPreferredSize(new Dimension(300, 36));
-        field.setFont(new Font("SansSerif", Font.PLAIN, 13));
-        field.setForeground(Color.GRAY);
-
-        field.setBorder(new CompoundBorder(
-                new LineBorder(Color.DARK_GRAY),
-                new EmptyBorder(6, 10, 6, 10)
-        ));
-
-
-        // ARREGLA EL PROBLEMA DE TENER QUE BORRAR ANTES DE ESCRIBIR, SE BORRA AL HACER CLICK
-
-        field.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                if (field.getText().equals(placeholder)) {
-                    field.setText("");
-                    field.setForeground(Color.BLACK);
-                }
+        JButton btnConfirmar = EstilosUI.roundedButton("PAGAR AHORA", EstilosUI.VERDE_CLARO, EstilosUI.VERDE);
+        btnConfirmar.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnConfirmar.addActionListener(e -> {
+            if (txtNombre.getText().trim().isEmpty() || txtDireccion.getText().trim().isEmpty()) {
+                JOptionPane.showMessageDialog(dialog, "Complete todos los campos obligatorios.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                return;
             }
-
-            @Override
-            public void focusLost(FocusEvent e) {
-                if (field.getText().isEmpty()) {
-                    field.setText(placeholder);
-                    field.setForeground(Color.GRAY);
-                }
-            }
+            JOptionPane.showMessageDialog(dialog, "¡Pago procesado con éxito! Gracias por comprar en SuperCuricó.");
+            Inventario.getInstancia().vaciarCarrito();
+            actualizarCarrito();
+            dialog.dispose();
+            frame.mostrarVista("INICIO");
         });
 
-        parent.add(field);
-        parent.add(Box.createVerticalStrut(13));
+        body.add(btnConfirmar);
+        dialog.add(body, BorderLayout.CENTER);
+        dialog.setVisible(true);
     }
 }
