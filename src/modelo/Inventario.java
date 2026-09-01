@@ -162,13 +162,12 @@ public class Inventario {
         double valorTotal = 0.0;
 
         for (Producto producto : productos){
-            valorTotal += (producto.getPrecio() * producto.getStock())
+            valorTotal += (producto.getPrecio() * producto.getStock());
         }
 
         return valorTotal;
     }
     //TAREA agregar el genenarador de id 
-
     
     //---Carrito---
     public List<ItemCarrito> getCarrito() {
