@@ -111,6 +111,65 @@ public class Inventario {
         return filtrados;
     }
 
+    // Metodos matematicos.
+
+    // Calculo del promedio segun la categoria
+    public double calcularPromedioPorCategoria(Categorias categoria){
+        if (categoria == null){
+            return 0.0;
+        }
+
+        double sumaPrecio = 0.0;
+        int cantidadProductos = 0;
+
+        //Recorre los productos
+        for (Producto producto : productos){
+            if (producto.getCategoria() == categoria){
+                sumaPrecio+=producto.getPrecio();
+                cantidadProductos++;
+            }
+        }
+
+        //Comprueba si es que no se encontró ningun producto
+        if (cantidadProductos == 0){
+            return 0.0;
+        }
+
+        return sumaPrecio/cantidadProductos; //Retorna el promedio
+    }
+
+    //Obtener el producto con menor stock (asi cuando hay poquito :O)
+    public Producto obtenerProductoPorMenorStock(Categorias categoria){
+        if (categoria == null){
+            return null;
+        }
+        
+        Producto productoMenor = null;
+        
+        //Recorre y filtra los productos
+        for (Producto producto : productos){
+            if(producto.getCategoria() == categoria){
+                if(productoMenor== null || producto.getStock()<productoMenor.getStock()){
+                    productoMenor = producto;
+                }
+            }
+        }
+        return productoMenor;
+    }
+
+    public double calculoValorTotalInventario(){
+
+        double valorTotal = 0.0;
+
+        for (Producto producto : productos){
+            valorTotal += (producto.getPrecio() * producto.getStock())
+        }
+
+        return valorTotal;
+    }
+    //TAREA agregar el genenarador de id 
+
+    
     //---Carrito---
     public List<ItemCarrito> getCarrito() {
         return carrito;
