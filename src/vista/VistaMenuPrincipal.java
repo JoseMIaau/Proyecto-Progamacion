@@ -14,6 +14,16 @@ public class VistaMenuPrincipal extends JPanel {
     private final BaseFrame frame;
     private JLabel bannerText;
     private int indicePromo = 0;
+    private String getImagenCategoria (categorias cat){
+          private String getImagenCategoria (categorias cat){
+        Switch (cat){
+            case FRUTAS_Y_VERDURAS:
+                return "/imagene/categoria/FRUTAS_Y_VERDURAS.jpg";
+                
+
+        }
+    }
+    }
 
     private final String[] promociones = {
             "<html><div style='text-align:center;'>Verduras frescas<br><b>TODOS LOS DÍAS</b></div></html>",
@@ -123,41 +133,117 @@ public class VistaMenuPrincipal extends JPanel {
         return header;
     }
 
-    private JPanel createCategoryCard(Categorias cat) {
-        JPanel p = new JPanel();
-        p.setOpaque(false);
-        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
+  private JPanel createCategoryCard(Categorias cat) {
 
-        JButton circleBtn = new JButton() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(EstilosUI.getColorPorCategoria(cat));
-                g2.fillOval(0, 0, getWidth(), getHeight());
-                g2.dispose();
-                super.paintComponent(g);
+    JPanel p = new JPanel();
+
+    p.setOpaque(false);
+    p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
+
+    // Cargar imagen de la categoría
+    ImageIcon icono = cargarImagenCategoria(cat);
+    Image imagen = icono != null ? icono.getImage() : null;
+
+    JButton circleBtn = new JButton() {
+
+        @Override
+        protected void paintComponent(Graphics g) {
+
+            Graphics2D g2 = (Graphics2D) g.create();
+
+            g2.setRenderingHint(
+                    RenderingHints.KEY_ANTIALIASING,
+                    RenderingHints.VALUE_ANTIALIAS_ON
+            );
+
+            int ancho = getWidth();
+            int alto = getHeight();
+
+            // Forma circular  
+              
+            Shape circulo =
+                    new java.awt.geom.Ellipse2D.Double(
+                            0, 0, ancho, alto
+                    );
+
+            // Todo lo que se dibuje después
+            // quedará dentro del círculo
+            g2.setClip(circulo);
+
+            // Color de fondo
+            g2.setColor(
+                    EstilosUI.getColorPorCategoria(cat)
+            );
+
+            g2.fillOval(
+                    0,
+                    0,
+                    ancho,
+                    alto
+            );
+
+            // Imagen
+            if (imagen != null) {
+
+                g2.drawImage(
+                        imagen,
+                        0,
+                        0,
+                        ancho,
+                        alto,
+                        this
+                );
             }
-        };
 
-        circleBtn.setPreferredSize(new Dimension(85, 85));
-        circleBtn.setMaximumSize(new Dimension(85, 85));
-        circleBtn.setFocusPainted(false);
-        circleBtn.setBorderPainted(false);
-        circleBtn.setContentAreaFilled(false);
-        circleBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        circleBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+            g2.dispose();
+        }
+    };
 
-        // Al hacer clic en el círculo, filtra los productos por esa categoría
-        circleBtn.addActionListener(e -> frame.mostrarProductosPorCategoria(cat));
+    circleBtn.setPreferredSize(
+            new Dimension(85, 85)
+    );
 
-        JLabel label = new JLabel(cat.name().replace("_", " "));
-        label.setFont(new Font("SansSerif", Font.BOLD, 12));
-        label.setAlignmentX(Component.CENTER_ALIGNMENT);
+    circleBtn.setMaximumSize(
+            new Dimension(85, 85)
+    );
 
-        p.add(circleBtn);
-        p.add(Box.createVerticalStrut(6));
-        p.add(label);
-        return p;
-    }
+    circleBtn.setFocusPainted(false);
+    circleBtn.setBorderPainted(false);
+    circleBtn.setContentAreaFilled(false);
+
+    circleBtn.setCursor(
+            Cursor.getPredefinedCursor(
+                    Cursor.HAND_CURSOR
+            )
+    );
+
+    circleBtn.setAlignmentX(
+            Component.CENTER_ALIGNMENT
+    );
+
+    circleBtn.addActionListener(
+            e -> frame.mostrarProductosPorCategoria(cat)
+    );
+
+    JLabel label =
+            new JLabel(cat.name().replace("_", " "));
+
+    label.setFont(
+            new Font(
+                    "SansSerif",
+                    Font.BOLD,
+                    12
+            )
+    );
+
+    label.setAlignmentX(
+            Component.CENTER_ALIGNMENT
+    );
+
+    p.add(circleBtn);
+    p.add(Box.createVerticalStrut(6));
+    p.add(label);
+
+    return p;
+}
 }
