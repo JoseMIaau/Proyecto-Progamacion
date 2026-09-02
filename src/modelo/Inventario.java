@@ -1,5 +1,5 @@
 package modelo;
-
+import java.util.HashMap;
 import java.util.ArrayList;
 import persistencia.GestorArchivo;
 import java.util.List;
@@ -9,12 +9,19 @@ public class Inventario {
     private List<Producto> productos;
     private List<ItemCarrito> carrito;
     private GestorArchivo gestorArchivo;
+    private GestorArchivo gestorUsuario;
+    private HashMap<String, Admin> usuariosAdmin;
+    private Admin adminActual;
 
     private Inventario() {
         this.gestorArchivo = new GestorArchivo("inventario.csv");
+        this.gestorUsuario = new GestorArchivo("usuarios.csv");
         this.productos = gestorArchivo.cargarCatalogo();
         this.carrito = new ArrayList<>();
+        this.usuariosAdmin = gestorUsuario.cargarAdmins();
+        this.adminActual = null;
         inicializarDatosDemoSiVacio();
+
     }
 
     public static Inventario getInstancia() {
@@ -22,6 +29,35 @@ public class Inventario {
             instancia = new Inventario();
         }
         return instancia;
+    }
+
+    public boolean registrarAdmin(String usuario, String contrasena) {
+        if (usuario == null || contrasena == null) return false;
+        String userTrim = usuario.trim();
+        if (userTrim.isEmpty() || contrasena.trim().isEmpty()) return false;
+
+        if (usuariosAdmin.containsKey(userTrim)) {
+            return false;
+        }
+
+        Admin nuevo = new Admin(userTrim, contrasena);
+        usuariosAdmin.put(userTrim, nuevo);
+        gestorUsuario.guardarAdmin(new ArrayList<>(usuariosAdmin.values()));
+        return true;
+    }
+
+    public Admin iniciarSesion(String usuario, String contrasena) {
+        if (usuario == null || contrasena == null) return null;
+        String userTrim = usuario.trim();
+
+        if (usuariosAdmin.containsKey(userTrim)) {
+            Admin admin = usuariosAdmin.get(userTrim);
+            if (admin.getContrasena().equals(contrasena)) {
+                this.adminActual = admin;
+                return admin;
+            }
+        }
+        return null;
     }
 
     private void inicializarDatosDemoSiVacio() {
@@ -35,6 +71,18 @@ public class Inventario {
             productos.add(new Producto(7, "Detergente 1L", 3490.0, 20, Categorias.LIMPIEZA));
             gestorArchivo.guardarCatalogo(productos);
         }
+    }
+
+    public void cerrarSesion() {
+        this.adminActual = null;
+    }
+
+    public boolean hayAdminLogueado() {
+        return adminActual != null;
+    }
+
+    public Admin getAdminActual() {
+        return adminActual;
     }
 
     //Metodos CRUD
