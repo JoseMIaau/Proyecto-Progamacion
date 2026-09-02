@@ -1,4 +1,6 @@
 import vista.BaseFrame;
+import vista.VistaLogin;
+
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
