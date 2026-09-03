@@ -14,16 +14,7 @@ public class VistaMenuPrincipal extends JPanel {
     private final BaseFrame frame;
     private JLabel bannerText;
     private int indicePromo = 0;
-    private String getImagenCategoria (categorias cat){
-          private String getImagenCategoria (categorias cat){
-        Switch (cat){
-            case FRUTAS_Y_VERDURAS:
-                return "/imagene/categoria/FRUTAS_Y_VERDURAS.jpg";
-                
 
-        }
-    }
-    }
 
     private final String[] promociones = {
             "<html><div style='text-align:center;'>Verduras frescas<br><b>TODOS LOS DÍAS</b></div></html>",
@@ -140,9 +131,6 @@ public class VistaMenuPrincipal extends JPanel {
     p.setOpaque(false);
     p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
 
-    // Cargar imagen de la categoría
-    ImageIcon icono = cargarImagenCategoria(cat);
-    Image imagen = icono != null ? icono.getImage() : null;
 
     JButton circleBtn = new JButton() {
 
@@ -182,18 +170,7 @@ public class VistaMenuPrincipal extends JPanel {
                     alto
             );
 
-            // Imagen
-            if (imagen != null) {
-
-                g2.drawImage(
-                        imagen,
-                        0,
-                        0,
-                        ancho,
-                        alto,
-                        this
-                );
-            }
+           
 
             g2.dispose();
         }
