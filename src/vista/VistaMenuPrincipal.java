@@ -15,7 +15,7 @@ public class VistaMenuPrincipal extends JPanel {
     private JLabel bannerText;
     private int indicePromo = 0;
 
-
+//Banner de promociones 
     private final String[] promociones = {
             "<html><div style='text-align:center;'>Verduras frescas<br><b>TODOS LOS DÍAS</b></div></html>",
             "<html><div style='text-align:center;'>Ofertas en Carnes y Lácteos<br><b>HASTA 30% DCTO</b></div></html>",
@@ -117,9 +117,24 @@ public class VistaMenuPrincipal extends JPanel {
         });
         header.add(search, BorderLayout.CENTER);
 
-        JButton cart = EstilosUI.iconButton("🛒");
-        cart.addActionListener(e -> frame.mostrarVista("CARRO"));
-        header.add(cart, BorderLayout.EAST);
+        //Botones lado derecho del encabezado
+        
+        JButton carro = EstilosUI.iconButton("🛒");
+        carro.addActionListener(e -> frame.mostrarVista("CARRO"));
+
+        JButton login = EstilosUI.iconButton("👤");
+        login.addActionListener(e -> frame.mostrarVista("LOGIN"));
+
+        JPanel contenedor = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 0));
+        contenedor.setOpaque(false);
+
+        contenedor.add(carro);
+        contenedor.add(login);
+
+        header.add(contenedor, BorderLayout.EAST);
+
+
+        /*Tambíen estaba la opción de usar una GridBag */
 
         return header;
     }
@@ -133,11 +148,11 @@ public class VistaMenuPrincipal extends JPanel {
 
 
     JButton circleBtn = new JButton() {
-
+        //PPT 14: pag 21(Programación Avanzada)  
         @Override
         protected void paintComponent(Graphics g) {
 
-            Graphics2D g2 = (Graphics2D) g.create();
+            Graphics2D g2 = (Graphics2D) g.create(); 
 
             g2.setRenderingHint(
                     RenderingHints.KEY_ANTIALIASING,

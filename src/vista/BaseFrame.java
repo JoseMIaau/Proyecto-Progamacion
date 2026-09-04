@@ -12,6 +12,7 @@ public class BaseFrame extends JFrame {
     private VistaMenuPrincipal vistaMenuPrincipal;
     private VistaProductos vistaProductos;
     private VistaCarrito vistaCarrito;
+    private VistaLogin vistaLogin;
 
     public BaseFrame() {
         super("SuperCuricó");
@@ -23,10 +24,12 @@ public class BaseFrame extends JFrame {
         vistaMenuPrincipal = new VistaMenuPrincipal(this);
         vistaProductos = new VistaProductos(this);
         vistaCarrito = new VistaCarrito(this);
+        vistaLogin = new VistaLogin(this);
 
         root.add(vistaMenuPrincipal, "INICIO");
         root.add(vistaProductos, "PRODUCTOS");
         root.add(vistaCarrito, "CARRO");
+        root.add(vistaLogin, "LOGIN");
 
         setContentPane(root);
         cardLayout.show(root, "INICIO");

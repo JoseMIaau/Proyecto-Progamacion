@@ -6,12 +6,14 @@ import java.awt.*;
 
 public class VistaLogin extends JPanel {
 
+    private BaseFrame frame; 
     private JTextField txtUsuario;
     private JPasswordField txtContrasena;
     private JButton btnIngresar;
 
-    public VistaLogin() {
+    public VistaLogin(BaseFrame frame) {
 
+        this.frame = frame;
         setLayout(new GridBagLayout());
         setBackground(EstilosUI.FONDO);
 
