@@ -215,7 +215,18 @@ public class Inventario {
 
         return valorTotal;
     }
-    //TAREA agregar el genenarador de id 
+
+    //Generador de ID
+    public int generarId(){
+        int mayorId = 0;
+
+        for(Producto producto : productos){
+            if(producto.getId() > mayorId){
+                mayorId = producto.getId();
+            }
+        }
+        return mayorId + 1;
+    }
     
     //---Carrito---
     public List<ItemCarrito> getCarrito() {
