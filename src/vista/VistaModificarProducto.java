@@ -1,4 +1,3 @@
-```java
 package vista;
 
 import modelo.Inventario;
