@@ -2,6 +2,9 @@ package vista;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+
+import modelo.Inventario;
+
 import java.awt.*;
 
 public class VistaLogin extends JPanel {
@@ -73,7 +76,16 @@ public class VistaLogin extends JPanel {
         );
 
         btnIngresar.addActionListener(e -> {
-            frame.mostrarVista("ADMIN");
+            String user = txtUsuario.getText().trim();
+            String pass = new String(txtContrasena.getPassword()).trim();
+            
+            if (Inventario.getInstancia().iniciarSesion(user, pass) != null) {
+                txtUsuario.setText("");
+                txtContrasena.setText("");
+                frame.mostrarVista("ADMIN");
+            }else {
+                JOptionPane.showMessageDialog(this, "Correo o contraseña incorrectos.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
         });
 
         gbc.gridy = 6;

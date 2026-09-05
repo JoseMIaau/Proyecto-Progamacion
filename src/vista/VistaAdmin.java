@@ -54,7 +54,7 @@ public class VistaAdmin extends JPanel {
         btnAgregar = new JButton("Agregar Producto");
         btnEliminar = new JButton("Eliminar Producto");
         btnVolver = new JButton("Volver al Menu Principal");
-
+        //javi agreguemos aqui el btnModificar y que en el action listener que haga lo que estaba haceidno la clase de modificar producto
         pnlSur.add(btnAgregar);
         pnlSur.add(btnEliminar);
         pnlSur.add(btnVolver);
@@ -74,7 +74,6 @@ public class VistaAdmin extends JPanel {
 
     private void agregarProducto() {
 
-        JTextField txtId = new JTextField();
         JTextField txtNombre = new JTextField();
         JTextField txtPrecio = new JTextField();
         JTextField txtStock = new JTextField();
@@ -85,9 +84,6 @@ public class VistaAdmin extends JPanel {
         JPanel panel = new JPanel();
 
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-
-        panel.add(new JLabel("ID del producto:"));
-        panel.add(txtId);
 
         panel.add(new JLabel("Nombre:"));
         panel.add(txtNombre);
@@ -115,10 +111,6 @@ public class VistaAdmin extends JPanel {
 
         try {
 
-            int id = Integer.parseInt(
-                    txtId.getText().trim()
-            );
-
             String nombre = txtNombre.getText().trim();
 
             double precio = Double.parseDouble(
@@ -145,7 +137,7 @@ public class VistaAdmin extends JPanel {
             }
 
             Producto producto = new Producto(
-                    id, nombre, precio, stock, categoria
+                    0, nombre, precio, stock, categoria
             );
 
             boolean agregado =
