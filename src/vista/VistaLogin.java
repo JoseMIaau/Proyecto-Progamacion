@@ -82,7 +82,7 @@ public class VistaLogin extends JPanel {
             if (Inventario.getInstancia().iniciarSesion(user, pass) != null) {
                 txtUsuario.setText("");
                 txtContrasena.setText("");
-                frame.mostrarVista("ADMIN");
+                this.frame.mostrarVista("ADMIN");
             }else {
                 JOptionPane.showMessageDialog(this, "Correo o contraseña incorrectos.", "Error", JOptionPane.ERROR_MESSAGE);
             }
@@ -100,7 +100,7 @@ public class VistaLogin extends JPanel {
         );
 
         btnVolver.addActionListener(e -> {
-            frame.mostrarMenuPrincipal();
+            this.frame.mostrarMenuPrincipal();
         });
 
         gbc.gridy = 7;
