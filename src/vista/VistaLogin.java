@@ -10,6 +10,8 @@ public class VistaLogin extends JPanel {
     private JTextField txtUsuario;
     private JPasswordField txtContrasena;
     private JButton btnIngresar;
+    private JButton btnVolver;
+
 
     public VistaLogin(BaseFrame frame) {
 
@@ -70,9 +72,28 @@ public class VistaLogin extends JPanel {
                 Color.WHITE
         );
 
+        btnIngresar.addActionListener(e -> {
+            frame.mostrarVista("ADMIN");
+        });
+
         gbc.gridy = 6;
         gbc.insets = new Insets(20, 8, 8, 8);
         panel.add(btnIngresar, gbc);
+
+
+        btnVolver = EstilosUI.roundedButton(
+                "Volver",
+                Color.GRAY,
+                Color.WHITE
+        );
+
+        btnVolver.addActionListener(e -> {
+            frame.mostrarMenuPrincipal();
+        });
+
+        gbc.gridy = 7;
+        gbc.insets = new Insets(8, 8, 8, 8);
+        panel.add(btnVolver, gbc);
 
         add(panel);
     }
