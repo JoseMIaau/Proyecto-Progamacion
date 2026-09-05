@@ -9,7 +9,7 @@ import modelo.Producto;
 
 import javax.swing.*;
 import java.awt.*;
-
+//clase inutil
 public class VistaAgregarProducto extends JPanel {
 
     private final BaseFrame frame;
@@ -127,7 +127,7 @@ public class VistaAgregarProducto extends JPanel {
 
         btnAtras.addActionListener(e -> {
 
-            frame.mostrarVista("ADMINISTRAR");
+            frame.mostrarVista("ADMIN");
 
         });
 

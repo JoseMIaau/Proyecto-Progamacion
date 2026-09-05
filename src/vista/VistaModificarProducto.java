@@ -5,7 +5,7 @@ import modelo.Producto;
 
 import javax.swing.*;
 import java.awt.*;
-
+//clase inutil
 public class VistaModificarProducto extends JPanel {
 
     private final BaseFrame frame;
@@ -88,7 +88,7 @@ public class VistaModificarProducto extends JPanel {
         add(pnlBotones, BorderLayout.SOUTH);
 
         btnAtras.addActionListener(e -> {
-            frame.mostrarVista("ADMINISTRAR");
+            frame.mostrarVista("ADMIN");
         });
 
         btnModificar.addActionListener(e -> {

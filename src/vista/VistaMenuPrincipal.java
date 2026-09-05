@@ -99,7 +99,8 @@ public class VistaMenuPrincipal extends JPanel {
         header.add(left, BorderLayout.WEST);
 
         //Placeholder
-        JTextField search = new JTextField("Buscar producto y presionar Enter...");
+        String placeholder = "Buscar producto y presionar Enter...";
+        JTextField search = new JTextField(placeholder);
         search.setFont(EstilosUI.FONT_NORMAL);
         search.setForeground(Color.GRAY);
         search.setBorder(new CompoundBorder(
@@ -107,11 +108,33 @@ public class VistaMenuPrincipal extends JPanel {
                 new EmptyBorder(7, 15, 7, 15)
         ));
 
+        search.addFocusListener(new java.awt.event.FocusAdapter() {
+        @Override
+        public void focusGained(java.awt.event.FocusEvent e) {
+                if (search.getText().equals(placeholder)) {
+                search.setText("");
+                search.setForeground(Color.BLACK);
+                }
+        }
+        
+        @Override
+        public void focusLost(java.awt.event.FocusEvent e) {
+                if (search.getText().trim().isEmpty()) {
+                search.setText(placeholder);
+                search.setForeground(Color.GRAY);
+                }
+        }
+        });
+
+
         search.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
+        @Override
+        public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    frame.buscarProductosPorTexto(search.getText().trim());
+                    String texto = search.getText().trim();
+                    if (!texto.isEmpty() && !texto.equals(placeholder)) {
+                        frame.buscarProductosPorTexto(texto);
+                    }
                 }
             }
         });

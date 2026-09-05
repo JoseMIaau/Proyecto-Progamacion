@@ -43,6 +43,8 @@ public class BaseFrame extends JFrame {
             vistaProductos.mostrarTodosLosProductos();
         } else if ("CARRO".equals(vista)) {
             vistaCarrito.actualizarCarrito();
+        } else if ("ADMIN".equals(vista)) {
+            vistaAdmin.poblarTabla();
         }
         cardLayout.show(root, vista);
     }
@@ -52,9 +54,12 @@ public class BaseFrame extends JFrame {
         cardLayout.show(root, "PRODUCTOS");
     }
     public void mostrarMenuPrincipal() {    
-    cardLayout.show(root, "INICIO");
-}
+        cardLayout.show(root, "INICIO");
+    }
 
     public void buscarProductosPorTexto(String query) {
-            }
+        vistaProductos.buscarPorTexto(query);
+        vistaProductos.setTextoBuscador(query);
+        cardLayout.show(root, "PRODUCTOS");
+    }
 }

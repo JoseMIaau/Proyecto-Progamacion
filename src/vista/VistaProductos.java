@@ -85,17 +85,40 @@ public class VistaProductos extends JPanel {
         left.add(headerTitle);
         header.add(left, BorderLayout.WEST);
 
-        searchField.setText("Buscar...");
+        String placeholder = "Buscar...";
+        searchField.setText(placeholder);
         searchField.setFont(EstilosUI.FONT_NORMAL);
         searchField.setBorder(new CompoundBorder(
                 new LineBorder(new Color(220, 220, 220), 1, true),
                 new EmptyBorder(6, 12, 6, 12)
         ));
+        searchField.addFocusListener(new java.awt.event.FocusAdapter() {
+        @Override
+        public void focusGained(java.awt.event.FocusEvent e) {
+            if (searchField.getText().equals(placeholder)) {
+                searchField.setText("");
+                searchField.setForeground(Color.BLACK);
+            }
+        }
+
+        @Override
+        public void focusLost(java.awt.event.FocusEvent e) {
+            if (searchField.getText().trim().isEmpty()) {
+                searchField.setText(placeholder);
+                searchField.setForeground(Color.GRAY);
+                mostrarTodosLosProductos(); 
+            }
+        }
+        });
+
         searchField.addKeyListener(new KeyAdapter() {
             @Override
-            public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    //crear metodo de buscar texto
+            public void keyReleased(KeyEvent e) {
+                String texto = searchField.getText().trim();
+                if (texto.isEmpty() || texto.equals(placeholder)) {
+                    mostrarTodosLosProductos();
+                } else {
+                    buscarPorTexto(texto);
                 }
             }
         });
@@ -106,6 +129,16 @@ public class VistaProductos extends JPanel {
         header.add(cart, BorderLayout.EAST);
 
         return header;
+    }
+
+    public void buscarPorTexto(String query) {
+        headerTitle.setText("Resultados para: \"" + query + "\"");
+        renderizarLista(Inventario.getInstancia().buscarPorNombre(query));
+    }
+
+    public void setTextoBuscador(String texto) {
+        searchField.setText(texto);
+        searchField.setForeground(Color.BLACK);
     }
 
     private JPanel createProductCard(Producto prod) {
@@ -191,21 +224,36 @@ public class VistaProductos extends JPanel {
         btnConfirmar.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnConfirmar.addActionListener(e -> {
             try {
-                double cant = Double.parseDouble(txtUnits.getText().trim().replace(",", "."));
-                if (cant <= 0) {
-                    JOptionPane.showMessageDialog(dialog, "La cantidad debe ser mayor a 0", "Error", JOptionPane.WARNING_MESSAGE);
-                    return;
-                }
-                if (cant > prod.getStock()) {
-                    JOptionPane.showMessageDialog(dialog, "Stock insuficiente. Solo quedan " + prod.getStock() + " unidades.", "Aviso", JOptionPane.WARNING_MESSAGE);
-                    return;
-                }
-                Inventario.getInstancia().agregarAlCarrito(prod, cant);
+            String texto = txtUnits.getText().trim();
+
+            if (texto.isEmpty()) {
+                JOptionPane.showMessageDialog(dialog, "Debe ingresar una cantidad.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            int cant = Integer.parseInt(texto);
+
+            if (cant <= 0) {
+                JOptionPane.showMessageDialog(dialog, "La cantidad debe ser mayor a 0.", "Cantidad Inválida", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            boolean agregado = Inventario.getInstancia().agregarAlCarrito(prod, cant);
+
+            if (agregado) {
                 JOptionPane.showMessageDialog(dialog, "¡" + prod.getNombre() + " agregado al carrito!");
                 dialog.dispose();
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(dialog, "Ingrese un número válido", "Error", JOptionPane.ERROR_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(dialog, 
+                    "No se puede agregar: la cantidad solicitada (sumada a lo que ya tienes en el carro) supera el stock disponible (" + prod.getStock() + ").", 
+                    "Stock Insuficiente", 
+                    JOptionPane.WARNING_MESSAGE);
             }
+
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(dialog, "Por favor ingrese un número entero válido.", "Formato Inválido", JOptionPane.ERROR_MESSAGE);
+            txtUnits.setText("1");
+        }
         });
 
         body.add(btnConfirmar);
